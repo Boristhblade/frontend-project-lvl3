@@ -33,7 +33,7 @@ export default () => {
   })
   form.addEventListener('submit', (e) => {
     e.preventDefault()
-    isValid(watchedState.watchedUrls).validate(watchedState.urlInput)
+    isValid(watchedState.watchedUrls).validate(watchedState.urlInput, { abortEarly: true })
       .then((isValid) => {
         watchedState.watchedUrls = [...watchedState.watchedUrls, watchedState.urlInput]
         watchedState.status = 'successful'
