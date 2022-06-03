@@ -3,6 +3,8 @@ import { string } from 'yup'
 import { renderFeedback, renderRss } from './renderers.js'
 import i18next from 'i18next'
 import resources from './locales/index.js'
+import axios from 'axios'
+import parse from './parser.js'
 
 const isValid = (urls) => string().url('invalid').notOneOf(urls, 'existing')
 
@@ -13,6 +15,7 @@ export default (initialState = {}) => {
     status: null,
     urlInput: '',
     watchedUrls: [],
+    feeds: [],
     errors: {}
   };
   const i18Instance = i18next.createInstance()
@@ -31,19 +34,26 @@ export default (initialState = {}) => {
           renderFeedback(feedbackEl, value, inputEl, i18Instance)
         }
         if (path.match(/^watchedUrls/)) {
-          renderRss(feedContainer, value, i18Instance.t('texts'))
+          const lastUrl = value[value.length - 1];
+          console.log(value)
+          axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(lastUrl)}`)
+            .then((response) =>parse(response.data.contents))
+            .catch((e) => watchedState.status = 'invalid')
+            .then((parsedData) => watchedState.feeds = [...watchedState.feeds, parsedData])
+          // 
+        }
+        if (path.match(/^feeds/)) {
+          console.log(value);
+          renderRss(feedContainer, value, i18Instance)
         }
       })
       inputEl.addEventListener('input', (e) => {
         watchedState.urlInput = e.target.value
-        // console.log(watchedState.urlInput)
-        // schema.isValid(watchedState.urlInput)
-        //   .then((e) => console.log(e))
-        //   .catch((err) => console.log(`ERROR :::: ${err}`))
       })
       form.addEventListener('submit', (e) => {
         e.preventDefault()
-        isValid(watchedState.watchedUrls).validate(watchedState.urlInput, { abortEarly: true })
+        isValid(watchedState.watchedUrls)
+          .validate(watchedState.urlInput, { abortEarly: true })
           .then((isValid) => {
             watchedState.watchedUrls = [...watchedState.watchedUrls, watchedState.urlInput]
             watchedState.status = 'successful'
@@ -51,10 +61,8 @@ export default (initialState = {}) => {
             inputEl.focus()
           })
           .catch((e) => {
-            // console.log(e)
+            console.log(e.errors[0])
             watchedState.status = e.errors[0]
-            // console.log(e)
-            // console.log(e.errors)
           })
       })
     })

@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 const renderFeedback = (elem, state, input, i18) => {
   if (state === 'invalid') {
     // console.log(i18)
@@ -22,23 +24,48 @@ const renderFeedback = (elem, state, input, i18) => {
 }
 
 const renderRss = (container, state, i18) => {
-  state.forEach(element => {
-    const newElement = document.createElement('div')
-    newElement.classList.add('row')
-    const elemHeader = document.createElement('div')
-    elemHeader.classList.add(...'col-md-10 col-lg-4 mx-auto order-0 order-lg-1 feeds'.split(' '))
-    elemHeader.innerHTML = `
-      <div class="card border-0">
+  const postsEl = document.querySelector('.posts')
+  const feedsEl = document.querySelector('.feeds')
+  console.log(state)
+  const feedsInner = `
+    <div class="card border-0">
         <div class="card-body">
-          <h2 class="card-title h4">${state}</h2>
+          <h2 class="card-title h4">${i18.t('texts.rssFeed.feeds')}</h2>
         </div>
-      </div>
-    `
-    newElement.appendChild(elemHeader)
-    container.appendChild(newElement)
-  })
+      <ul class="list-group border-0 rounded-0">
+        ${state.map(({ title, description }) => {
+          return `
+            <li class="list-group-item border-0 border-end-0">
+              <h3 class="h6 m-0">${title}</h3>
+              <p class="m-0 small text-black-50">${description}</p>
+            </li>
+          `          
+        }).join('')}
+      </ul>
+    </div>
+  `
+  const postsInner = `
+    <div class="card border-0">
+        <div class="card-body">
+          <h2 class="card-title h4">${i18.t('texts.rssFeed.posts')}</h2>
+        </div>
+      <ul class="list-group border-0 rounded-0">
+        ${state.map(elem => elem.posts.map(({ text, link }) => {
+          return `
+          <li class="list-group-item d-flex justify-content-between align-items-start border-0 border-end-0">
+            <a href="${link}" class="fw-bold" data-id="${_.uniqueId()}" target="_blank" rel="noopener noreferrer">${text}</a>
+            <button type="buttoarget="#modal">${i18.t('texts.rssFeed.watch')}</button>
+          </li>
+          `
+          }).join('')
+        ).join('')}
+      <ul>
+    </div>
+  `
+  feedsEl.innerHTML = feedsInner
+  postsEl.innerHTML = postsInner
 }
-/* <div class="col-md-10 col-lg-4 mx-auto order-0 order-lg-1 feeds">
+/* <div class="col-md-10 col-lg-4 mx-auto order-0 order-lg-1 feeds"
   <div class="card border-0">
       <div class="card-body">
         <h2 class="card-title h4">Фиды</h2>
@@ -51,4 +78,14 @@ const renderRss = (container, state, i18) => {
     </ul>
   </div>
 </div> */
+
+/* <div class="card border-0">
+      <div class="card-body">
+        <h2 class="card-title h4">Посты</h2>
+      </div>
+    <ul class="list-group border-0 rounded-0">
+      <li class="list-group-item d-flex justify-content-between align-items-start border-0 border-end-0">
+        <a href="http://example.com/test/1654271460" class="fw-bold" data-id="118" target="_blank" rel="noopener noreferrer">Lorem ipsum 2022-06-03T15:51:00Z</a>
+        <button type="buttoarget="#modal">Просмотр</button>
+      </li> */
 export { renderFeedback, renderRss }

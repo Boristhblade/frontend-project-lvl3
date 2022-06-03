@@ -8,6 +8,11 @@ export default {
         successful: 'RSS успешно загружен',
         invalid: 'Ссылка должна быть валидным URL',
         existing: 'RSS уже существует',
+      },
+      rssFeed: {
+        posts: 'Посты',
+        feeds: 'Фиды',
+        watch: 'Просмотр',
       }
     }
   }
