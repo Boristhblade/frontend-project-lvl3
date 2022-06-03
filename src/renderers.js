@@ -1,16 +1,17 @@
-const renderFeedback = (elem, state, input) => {
+const renderFeedback = (elem, state, input, i18) => {
   if (state === 'invalid') {
-    elem.textContent = 'Ссылка должна быть валидным URL'
+    // console.log(i18)
+    elem.textContent = i18.t('texts.statusMessage.invalid')
     elem.classList.remove('text-success')
     elem.classList.add('text-danger')
     input.classList.add('is-invalid')
   } else if (state === 'existing') {
-    elem.textContent = 'RSS уже существует'
+    elem.textContent = i18.t('texts.statusMessage.existing')
     elem.classList.remove('text-success')
     elem.classList.add('text-danger')
     input.classList.add('is-invalid')
   } else if (state === 'successful') {
-    elem.textContent = 'RSS успешно загружен'
+    elem.textContent = i18.t('texts.statusMessage.successful')
     elem.classList.remove('text-danger')
     elem.classList.add('text-success')
     input.classList.remove('is-invalid')
@@ -20,7 +21,7 @@ const renderFeedback = (elem, state, input) => {
   }
 }
 
-const renderRss = (container, state) => {
+const renderRss = (container, state, i18) => {
   state.forEach(element => {
     const newElement = document.createElement('div')
     newElement.classList.add('row')
