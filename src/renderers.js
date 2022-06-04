@@ -2,7 +2,6 @@ import _ from 'lodash'
 
 const renderFeedback = (elem, state, input, i18) => {
   if (state === 'invalid') {
-    // console.log(i18)
     elem.textContent = i18.t('texts.statusMessage.invalid')
     elem.classList.remove('text-success')
     elem.classList.add('text-danger')
@@ -23,9 +22,7 @@ const renderFeedback = (elem, state, input, i18) => {
   }
 }
 
-const renderRss = (container, state, i18) => {
-  const postsEl = document.querySelector('.posts')
-  const feedsEl = document.querySelector('.feeds')
+const renderFeeds = (container, state, i18) => {
   console.log(state)
   const feedsInner = `
     <div class="card border-0">
@@ -44,26 +41,29 @@ const renderRss = (container, state, i18) => {
       </ul>
     </div>
   `
+  container.innerHTML = feedsInner
+}
+
+const renderPosts = (container, state, i18) => {
   const postsInner = `
-    <div class="card border-0">
-        <div class="card-body">
-          <h2 class="card-title h4">${i18.t('texts.rssFeed.posts')}</h2>
-        </div>
-      <ul class="list-group border-0 rounded-0">
-        ${state.map(elem => elem.posts.map(({ text, link }) => {
-          return `
-          <li class="list-group-item d-flex justify-content-between align-items-start border-0 border-end-0">
-            <a href="${link}" class="fw-bold" data-id="${_.uniqueId()}" target="_blank" rel="noopener noreferrer">${text}</a>
-            <button type="buttoarget="#modal">${i18.t('texts.rssFeed.watch')}</button>
-          </li>
-          `
-          }).join('')
-        ).join('')}
-      <ul>
-    </div>
+  <div class="card border-0">
+      <div class="card-body">
+        <h2 class="card-title h4">${i18.t('texts.rssFeed.posts')}</h2>
+      </div>
+    <ul class="list-group border-0 rounded-0">
+      ${state.map(({ text, link }) => {
+        return `
+        <li class="list-group-item d-flex justify-content-between align-items-start border-0 border-end-0">
+          <a href="${link}" class="fw-bold" data-id="${_.uniqueId()}" target="_blank" rel="noopener noreferrer">${text}</a>
+          <button type="buttoarget="#modal">${i18.t('texts.rssFeed.watch')}</button>
+        </li>
+        `
+        }
+      ).join('')}
+    <ul>
+  </div>
   `
-  feedsEl.innerHTML = feedsInner
-  postsEl.innerHTML = postsInner
+  container.innerHTML = postsInner
 }
 /* <div class="col-md-10 col-lg-4 mx-auto order-0 order-lg-1 feeds"
   <div class="card border-0">
@@ -88,4 +88,4 @@ const renderRss = (container, state, i18) => {
         <a href="http://example.com/test/1654271460" class="fw-bold" data-id="118" target="_blank" rel="noopener noreferrer">Lorem ipsum 2022-06-03T15:51:00Z</a>
         <button type="buttoarget="#modal">Просмотр</button>
       </li> */
-export { renderFeedback, renderRss }
+export { renderFeedback, renderFeeds, renderPosts }

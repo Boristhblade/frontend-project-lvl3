@@ -1,12 +1,25 @@
 import onChange from 'on-change'
 import { string } from 'yup'
-import { renderFeedback, renderRss } from './renderers.js'
+import { renderFeedback, renderFeeds, renderPosts } from './renderers.js'
 import i18next from 'i18next'
 import resources from './locales/index.js'
 import axios from 'axios'
 import parse from './parser.js'
+import buildPath from './path.js'
 
 const isValid = (urls) => string().url('invalid').notOneOf(urls, 'existing')
+
+const updateFeed = (state, value) => {
+  const cb = () => {
+    Promise.all(value.map(url => axios.get(buildPath(url))))
+      .then((data) => {
+        const newPosts = _.differenceBy(state.posts, data, 'link')
+        if (newPosts.length !== 0) { state.posts = [...newPosts, ...state.posts] }
+        setTimeout(cb, 5000)
+      })
+  }
+  setTimeout(cb, 5000)
+}
 
 export default (initialState = {}) => {
   const defaultLanguage = 'ru';
@@ -16,6 +29,7 @@ export default (initialState = {}) => {
     urlInput: '',
     watchedUrls: [],
     feeds: [],
+    posts: [],
     errors: {}
   };
   const i18Instance = i18next.createInstance()
@@ -28,7 +42,8 @@ export default (initialState = {}) => {
       const form = document.querySelector('form')
       const inputEl = document.getElementById('url-input')
       const feedbackEl = document.querySelector('.text-danger')
-      const feedContainer = document.querySelector('.container-xxl')
+      const feedsEl = document.querySelector('.feeds')
+      const postsEl = document.querySelector('.posts')
       const watchedState = onChange(state, (path, value) => {
         if (path.match(/^status/)) {
           renderFeedback(feedbackEl, value, inputEl, i18Instance)
@@ -36,15 +51,25 @@ export default (initialState = {}) => {
         if (path.match(/^watchedUrls/)) {
           const lastUrl = value[value.length - 1];
           console.log(value)
-          axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(lastUrl)}`)
+          axios.get(buildPath(lastUrl))
             .then((response) =>parse(response.data.contents))
-            .catch((e) => watchedState.status = 'invalid')
-            .then((parsedData) => watchedState.feeds = [...watchedState.feeds, parsedData])
+            .catch((e) => {
+              console.log(`PARSER ERROR app.js :43 ${e}`)
+              watchedState.status = 'invalid'
+            })
+            .then((parsedData) => {
+              const { title, description, posts } = parsedData
+              watchedState.feeds = [...watchedState.feeds, { title, description }]
+              watchedState.posts = [...posts, ...watchedState.posts]
+              updateFeed(watchedState, value)
+            })
           // 
         }
         if (path.match(/^feeds/)) {
-          console.log(value);
-          renderRss(feedContainer, value, i18Instance)
+          renderFeeds(feedsEl, value, i18Instance)
+        }
+        if (path.match(/^posts/)) {
+          renderPosts(postsEl, value, i18Instance)
         }
       })
       inputEl.addEventListener('input', (e) => {

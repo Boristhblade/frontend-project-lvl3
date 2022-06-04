@@ -1,9 +1,9 @@
 export default (data) => {
   const parser = new DOMParser;
   const htmlData = parser.parseFromString(data, 'application/xml')
-  const errors = parser.querySelector('parsererror')
-  console.log(htmlData)
-  console.log(`ERRORS: ${errors}`)
+  // const errors = parser.querySelector('parsererror')
+  // console.log(htmlData)
+  // console.log(`ERRORS: ${errors}`)
   // if (errors) { throw new Error(errors) }
   const title = htmlData.querySelector('title').textContent
   const description = htmlData.querySelector('description').textContent
@@ -16,6 +16,6 @@ export default (data) => {
       link,
     }
   })
-  console.log(posts)
+  // console.log(posts)
   return { title, description, posts }
 }
