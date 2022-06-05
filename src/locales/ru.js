@@ -1,7 +1,7 @@
 export default {
   translation: {
     languages: {
-      ru: 'Русский'
+      ru: 'Русский',
     },
     texts: {
       statusMessage: {
@@ -13,7 +13,7 @@ export default {
         posts: 'Посты',
         feeds: 'Фиды',
         watch: 'Просмотр',
-      }
-    }
-  }
-}
+      },
+    },
+  },
+};
