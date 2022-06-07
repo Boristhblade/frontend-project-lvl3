@@ -4,7 +4,7 @@ import axios from 'axios';
 import i18next from 'i18next';
 import _ from 'lodash';
 import {
-  renderFeedback, renderFeeds, renderModal, renderPosts,
+  renderFeedback, renderFeeds, renderModal, renderPosts, renderViewed,
 } from './renderers.js';
 import resources from './locales/index.js';
 import parse from './parser.js';
@@ -30,9 +30,10 @@ const updateFeed = (state) => {
 };
 
 const openModalHandler = (state, id) => () => {
-  console.log(state.activePostId);
   state.activePostId = id;
-  console.log(state.activePostId);
+  if (!state.viewedIds.includes(id)) {
+    state.viewedIds = [...state.viewedIds, id];
+  }
 };
 
 export default () => {
@@ -45,7 +46,7 @@ export default () => {
     watchedUrls: [],
     feeds: [],
     posts: [],
-    errors: {},
+    viewedIds: [],
   };
   const i18Instance = i18next.createInstance();
   i18Instance.init({
@@ -69,11 +70,15 @@ export default () => {
           renderFeeds(feedsEl, value, i18Instance);
         }
         if (path.match(/^posts/)) {
-          renderPosts(postsEl, value, i18Instance, openModalHandler);
+          renderPosts(postsEl, value, i18Instance, openModalHandler, watchedState);
         }
         if (path.match(/^activePostId/)) {
-          console.log('ACTIVE POST VALUE:::::' + value);
-          renderModal(modalEl, watchedState, i18Instance);
+          if (value) {
+            renderModal(modalEl, watchedState);
+          }
+        }
+        if (path.match(/^viewedIds/)) {
+          renderViewed(postsEl, value);
         }
       });
       updateFeed(watchedState, watchedState.urls);

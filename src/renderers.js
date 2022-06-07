@@ -39,17 +39,17 @@ const renderFeeds = (container, state, i18) => {
   container.innerHTML = feedsInner;
 };
 
-const renderPosts = (container, state, i18, handler) => {
+const renderPosts = (container, posts, i18, handler, state) => {
   const postsInner = `
   <div class="card border-0">
       <div class="card-body">
         <h2 class="card-title h4">${i18.t('texts.rssFeed.posts')}</h2>
       </div>
     <ul class="list-group border-0 rounded-0">
-      ${state.map(({ text, link, id }) => `
+      ${posts.map(({ text, link, id }) => `
         <li class="list-group-item d-flex justify-content-between align-items-start border-0 border-end-0">
-          <a href="${link}" class="fw-bold" data-id="${id}" target="_blank" rel="noopener noreferrer">${text}</a>
-          <button type="buttoarget="#modal">${i18.t('texts.rssFeed.watch')}</button>
+          <a href="${link}" class="${state.viewedIds.includes(id) ? 'fw-normal link-secondary' : 'fw-bold'}" data-id="${id}" target="_blank" rel="noopener noreferrer">${text}</a>
+          <button type="button" class="btn btn-outline-primary btn-sm" data-id="${id}" data-bs-toggle="modal" data-bs-target="#modal">${i18.t('texts.rssFeed.watch')}</button>
         </li>
         `).join('')}
     <ul>
@@ -63,40 +63,40 @@ const renderPosts = (container, state, i18, handler) => {
     });
 };
 
-const renderModal = (container, state, i18) => {
+const renderModal = (container, state) => {
   console.log(container);
   const { text, link, content } = state.posts.find((i) => i.id === state.activePostId);
   const titleEl = container.querySelector('.modal-title');
   titleEl.textContent = text;
-  const bodyEl = container.querySelector('modal-body');
+  const bodyEl = container.querySelector('.modal-body');
   bodyEl.textContent = content;
   const linkEl = document.querySelector('.btn-primary');
   linkEl.setAttribute('href', link);
   container.classList.add('show');
-  // const modalInner = `
-  // <div class="modal-dialog" role="document">
-  //   <div class="modal-content">
-  //     <div class="modal-header">
-  //       <h5 class="modal-title">${text}</h5>
-  //       <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
-  //     </div>
-  //     <div class="modal-body text-break">${content}</div>
-  //     <div class="modal-footer">
-  //     <a class="btn btn-primary full-article" href="${link}" role="button" target="_blank" rel="noopener noreferrer">${i18.t('texts.modal.read')}</a>
-  //     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${i18.t('texts.modal.close')}</button>
-  //     </div>
-  //   </div>
-  // </div>
-  // `;
+  container.setAttribute('style', 'display:block');
+  const backDrop = document.createElement('div');
+  backDrop.classList.add('modal-backdrop', 'fade', 'show');
+  container.after(backDrop);
   container
     .querySelectorAll('[data-bs-dismiss="modal"]')
     .forEach((btn) => {
       btn.addEventListener('click', () => {
+        state.activePostId = null;
         container.classList.remove('show');
+        container.setAttribute('style', 'display:none');
+        backDrop.remove();
       });
     });
 };
 
+const renderViewed = (postsEl, state) => {
+  state.forEach((id) => {
+    const elem = postsEl.querySelector(`a[data-id="${id}"]`);
+    elem.classList.remove('fw-bold');
+    elem.classList.add('fw-normal', 'link-secondary');
+  });
+};
+
 export {
-  renderFeedback, renderFeeds, renderPosts, renderModal,
+  renderFeedback, renderFeeds, renderPosts, renderModal, renderViewed,
 };
