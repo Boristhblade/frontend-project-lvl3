@@ -14,6 +14,11 @@ const renderFeedback = (elem, state, input, i18) => {
     elem.classList.remove('text-danger');
     elem.classList.add('text-success');
     input.classList.remove('is-invalid');
+  } else if (state === 'noValidRss') {
+    elem.textContent = i18.t('texts.statusMessage.noValidRss');
+    elem.classList.add('text-danger');
+    elem.classList.remove('text-success');
+    input.classList.add('is-invalid');
   } else {
     elem.textContent = '';
     input.classList.remove('is-invalid');

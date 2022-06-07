@@ -90,27 +90,22 @@ export default () => {
         isValid(watchedState.watchedUrls)
           .validate(watchedState.urlInput, { abortEarly: true })
           .then(() => {
-            watchedState.watchedUrls = [...watchedState.watchedUrls, watchedState.urlInput];
-            watchedState.status = 'successful';
             inputEl.value = '';
             inputEl.focus();
             return watchedState.urlInput;
           })
-          .catch(({ errors }) => {
-            console.log(errors[0]);
-            const [error] = errors;
-            watchedState.status = error;
-          })
           .then((url) => axios.get(buildPath(url)))
           .then((response) => parse(response.data.contents))
-          .catch((err) => {
-            console.log(`PARSER ERROR app.js :98 ${err}`);
-            watchedState.status = 'invalid';
-          })
           .then((parsedData) => {
             const { title, description, posts } = parsedData;
             watchedState.feeds = [...watchedState.feeds, { title, description }];
             watchedState.posts = [...posts, ...watchedState.posts];
+            watchedState.watchedUrls = [...watchedState.watchedUrls, watchedState.urlInput];
+            watchedState.status = 'successful';
+          })
+          .catch(({ errors }) => {
+            const [error] = errors;
+            watchedState.status = error;
           });
       });
     });
