@@ -29,7 +29,6 @@ export default (data) => {
     });
     return { title, description, posts };
   } catch (e) {
-    // console.log(new Error({ errors: ['noValidRss'] }));
     throw new ParseError();
   }
 };

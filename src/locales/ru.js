@@ -9,6 +9,7 @@ export default {
         invalid: 'Ссылка должна быть валидным URL',
         existing: 'RSS уже существует',
         noValidRss: 'Ресурс не содержит валидный RSS',
+        networkError: 'Ошибка сети',
       },
       rssFeed: {
         posts: 'Посты',

@@ -19,6 +19,11 @@ const renderFeedback = (elem, state, input, i18) => {
     elem.classList.add('text-danger');
     elem.classList.remove('text-success');
     input.classList.add('is-invalid');
+  } else if (state === 'networkError') {
+    elem.textContent = i18.t('texts.statusMessage.networkError');
+    elem.classList.add('text-danger');
+    elem.classList.remove('text-success');
+    input.classList.add('is-invalid');
   } else {
     elem.textContent = '';
     input.classList.remove('is-invalid');
@@ -69,7 +74,6 @@ const renderPosts = (container, posts, i18, handler, state) => {
 };
 
 const renderModal = (container, state) => {
-  console.log(container);
   const { text, link, content } = state.posts.find((i) => i.id === state.activePostId);
   const titleEl = container.querySelector('.modal-title');
   titleEl.textContent = text;

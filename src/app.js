@@ -61,7 +61,6 @@ export default () => {
       const feedsEl = document.querySelector('.feeds');
       const postsEl = document.querySelector('.posts');
       const modalEl = document.querySelector('#modal');
-      console.log(modalEl);
       const watchedState = onChange(state, (path, value) => {
         if (path.match(/^status/)) {
           renderFeedback(feedbackEl, value, inputEl, i18Instance);
@@ -103,9 +102,14 @@ export default () => {
             watchedState.watchedUrls = [...watchedState.watchedUrls, watchedState.urlInput];
             watchedState.status = 'successful';
           })
-          .catch(({ errors }) => {
-            const [error] = errors;
-            watchedState.status = error;
+          .catch((err) => {
+            console.log(err);
+            if (err.name === 'AxiosError') {
+              watchedState.status = 'networkError';
+            } else {
+              const [error] = err.errors;
+              watchedState.status = error;
+            }
           });
       });
     });
