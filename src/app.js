@@ -3,37 +3,36 @@ import { string } from 'yup';
 import axios from 'axios';
 import i18next from 'i18next';
 import _ from 'lodash';
-import { renderFeedback, renderFeeds, renderPosts } from './renderers.js';
+import {
+  renderFeedback, renderFeeds, renderModal, renderPosts,
+} from './renderers.js';
 import resources from './locales/index.js';
-
 import parse from './parser.js';
 import buildPath from './path.js';
 
 const isValid = (urls) => string().url('invalid').notOneOf(urls, 'existing');
 
 const updateFeed = (state) => {
-  console.log('UPDATE FEED');
   const cb = () => {
     Promise.all(state.watchedUrls.map((url) => axios.get(buildPath(url))))
       .then((responseArr) => {
-        console.log(responseArr);
         const postsAll = responseArr.reduce((acc, item) => {
           const { posts } = parse(item.data.contents);
-          console.log('POSTS :::::::::::');
-          console.log(posts);
           return [...acc, ...posts];
         }, []);
-        // ;
-        const newPosts = _.differenceBy(state.posts, postsAll, 'link');
+        const newPosts = _.differenceBy(postsAll, Array.from(state.posts), 'text');
         if (newPosts.length !== 0) { state.posts = [...newPosts, ...state.posts]; }
-        setTimeout(cb, 5000);
       })
-      .catch((e) => {
-        console.log(e);
-        setTimeout(cb, 5000);
-      });
+      .catch((e) => console.log(e))
+      .finally(() => setTimeout(cb, 5000));
   };
   setTimeout(cb, 5000);
+};
+
+const openModalHandler = (state, id) => () => {
+  console.log(state.activePostId);
+  state.activePostId = id;
+  console.log(state.activePostId);
 };
 
 export default () => {
@@ -42,6 +41,7 @@ export default () => {
     lng: defaultLanguage,
     status: null,
     urlInput: '',
+    activePostId: null,
     watchedUrls: [],
     feeds: [],
     posts: [],
@@ -53,12 +53,14 @@ export default () => {
     debug: false,
     resources,
   })
-    .then((t) => {
+    .then(() => {
       const form = document.querySelector('form');
       const inputEl = document.getElementById('url-input');
       const feedbackEl = document.querySelector('.text-danger');
       const feedsEl = document.querySelector('.feeds');
       const postsEl = document.querySelector('.posts');
+      const modalEl = document.querySelector('#modal');
+      console.log(modalEl);
       const watchedState = onChange(state, (path, value) => {
         if (path.match(/^status/)) {
           renderFeedback(feedbackEl, value, inputEl, i18Instance);
@@ -67,7 +69,11 @@ export default () => {
           renderFeeds(feedsEl, value, i18Instance);
         }
         if (path.match(/^posts/)) {
-          renderPosts(postsEl, value, i18Instance);
+          renderPosts(postsEl, value, i18Instance, openModalHandler);
+        }
+        if (path.match(/^activePostId/)) {
+          console.log('ACTIVE POST VALUE:::::' + value);
+          renderModal(modalEl, watchedState, i18Instance);
         }
       });
       updateFeed(watchedState, watchedState.urls);
@@ -78,7 +84,7 @@ export default () => {
         e.preventDefault();
         isValid(watchedState.watchedUrls)
           .validate(watchedState.urlInput, { abortEarly: true })
-          .then((isValid) => {
+          .then(() => {
             watchedState.watchedUrls = [...watchedState.watchedUrls, watchedState.urlInput];
             watchedState.status = 'successful';
             inputEl.value = '';
@@ -92,8 +98,8 @@ export default () => {
           })
           .then((url) => axios.get(buildPath(url)))
           .then((response) => parse(response.data.contents))
-          .catch((e) => {
-            console.log(`PARSER ERROR app.js :60 ${e}`);
+          .catch((err) => {
+            console.log(`PARSER ERROR app.js :98 ${err}`);
             watchedState.status = 'invalid';
           })
           .then((parsedData) => {
