@@ -4,4 +4,4 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/90bb36fbbea129bc3e17/test_coverage)](https://codeclimate.com/github/Boristhblade/frontend-project-lvl3/test_coverage)
 
 
-[Vercel](https://vercel.com/boristhblade/frontend-project-lvl3/VYhwDUR7dMhpdsKKiW1CCsGvWeGT)
+To check application, go to [Vercel](https://vercel.com/boristhblade/frontend-project-lvl3)
