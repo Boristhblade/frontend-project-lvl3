@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 function ParseError(message) {
   this.errors = ['noValidRss'];
   this.message = message || 'noValidRss';
@@ -18,12 +16,10 @@ export default (data) => {
     const posts = items.map((item) => {
       const text = item.querySelector('title').textContent;
       const link = item.querySelector('link').nextSibling.textContent;
-      const id = _.uniqueId();
       const content = item.querySelector('description').textContent;
       return {
         text,
         link,
-        id,
         content,
       };
     });

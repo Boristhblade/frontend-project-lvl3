@@ -1,4 +1,8 @@
-const renderFeedback = (elem, state, input, i18) => {
+import onChange from 'on-change';
+
+const renderFeedback = (state, i18) => {
+  const elem = document.querySelector('.text-danger');
+  const input = document.getElementById('url-input');
   if (state === 'invalid') {
     elem.textContent = i18.t('texts.statusMessage.invalid');
     elem.classList.remove('text-success');
@@ -30,7 +34,8 @@ const renderFeedback = (elem, state, input, i18) => {
   }
 };
 
-const renderFeeds = (container, state, i18) => {
+const renderFeeds = (state, i18) => {
+  const container = document.querySelector('.feeds');
   const feedsInner = `
     <div class="card border-0">
         <div class="card-body">
@@ -49,7 +54,8 @@ const renderFeeds = (container, state, i18) => {
   container.innerHTML = feedsInner;
 };
 
-const renderPosts = (container, posts, i18, handler, state) => {
+const renderPosts = (posts, i18, handler, state) => {
+  const container = document.querySelector('.posts');
   const postsInner = `
   <div class="card border-0">
       <div class="card-body">
@@ -73,7 +79,10 @@ const renderPosts = (container, posts, i18, handler, state) => {
     });
 };
 
-const renderModal = (container, state) => {
+const renderModal = (state) => {
+  console.log('MODAL !!!!!!!!!!!!!!!!!!!!!');
+  console.log(state);
+  const container = document.querySelector('#modal');
   const { text, link, content } = state.posts.find((i) => i.id === state.activePostId);
   const titleEl = container.querySelector('.modal-title');
   titleEl.textContent = text;
@@ -98,7 +107,8 @@ const renderModal = (container, state) => {
     });
 };
 
-const renderViewed = (postsEl, state) => {
+const renderViewed = (state) => {
+  const postsEl = document.querySelector('.posts');
   state.forEach((id) => {
     const elem = postsEl.querySelector(`a[data-id="${id}"]`);
     elem.classList.remove('fw-bold');
@@ -106,6 +116,31 @@ const renderViewed = (postsEl, state) => {
   });
 };
 
-export {
-  renderFeedback, renderFeeds, renderPosts, renderModal, renderViewed,
-};
+const makeWatchedState = (
+  state,
+  i18Instance,
+  openModalHandler,
+) => onChange(state, (path, value) => {
+  if (path.match(/^status/)) {
+    renderFeedback(value, i18Instance);
+    console.log(this);
+  }
+  if (path.match(/^feeds/)) {
+    renderFeeds(value, i18Instance);
+  }
+  if (path.match(/^posts/)) {
+    renderPosts(value, i18Instance, openModalHandler, state);
+  }
+  if (path.match(/^activePostId/)) {
+    console.log(path);
+    console.log(value);
+    if (value) {
+      renderModal(state);
+    }
+  }
+  if (path.match(/^viewedIds/)) {
+    renderViewed(value);
+  }
+});
+
+export default makeWatchedState;
