@@ -75,7 +75,7 @@ const renderPosts = (posts, i18, handler, state) => {
   container.querySelectorAll('button')
     .forEach((btn) => {
       const id = btn.previousElementSibling.getAttribute('data-id');
-      btn.addEventListener('click', handler(state, id));
+      btn.addEventListener('click', handler(id));
     });
 };
 
@@ -129,6 +129,7 @@ const makeWatchedState = (
     renderFeeds(value, i18Instance);
   }
   if (path.match(/^posts/)) {
+    console.log(this);
     renderPosts(value, i18Instance, openModalHandler, state);
   }
   if (path.match(/^activePostId/)) {

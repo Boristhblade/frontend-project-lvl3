@@ -26,13 +26,13 @@ const updateFeed = (state) => {
   setTimeout(cb, 5000);
 };
 
-const openModalHandler = (state, id) => () => {
-  state.activePostId = id;
-  console.log(state);
-  if (!state.viewedIds.includes(id)) {
-    state.viewedIds = [...state.viewedIds, id];
-  }
-};
+// const openModalHandler = (state, id) => () => {
+//   state.activePostId = id;
+//   console.log(state);
+//   if (!state.viewedIds.includes(id)) {
+//     state.viewedIds = [...state.viewedIds, id];
+//   }
+// };
 
 export default () => {
   const defaultLanguage = 'ru';
@@ -57,7 +57,13 @@ export default () => {
       const watchedState = makeWatchedState(
         state,
         i18Instance,
-        openModalHandler,
+        (id) => () => {
+          watchedState.activePostId = id;
+          console.log(state);
+          if (!state.viewedIds.includes(id)) {
+            watchedState.viewedIds = [...watchedState.viewedIds, id];
+          }
+        },
       );
       updateFeed(watchedState, watchedState.urls);
       form.addEventListener('submit', (e) => {
