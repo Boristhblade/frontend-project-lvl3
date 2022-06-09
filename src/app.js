@@ -66,8 +66,8 @@ export default () => {
         makeYupSchema(watchedState.watchedUrls)
           .validate(formData.get('url'), { abortEarly: true })
           .then((url) => axios.get(buildPath(url)))
-          .then((response) => parse(response.data.contents))
-          .then((parsedData) => {
+          .then((response) => {
+            const parsedData = parse(response.data.contents);
             const { title, description, posts } = parsedData;
             const postsWithIds = posts.map((post) => ({
               id: _.uniqueId(),
