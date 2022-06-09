@@ -1,7 +1,7 @@
 import onChange from 'on-change';
 
 const renderFeedback = (state, i18) => {
-  const elem = document.querySelector('.text-danger');
+  const elem = document.querySelector('.feedback');
   const input = document.getElementById('url-input');
   if (state === 'invalid') {
     elem.textContent = i18.t('texts.statusMessage.invalid');
