@@ -1,41 +1,53 @@
 import onChange from 'on-change';
 
-const renderFeedback = (state, i18) => {
-  const elem = document.querySelector('.feedback');
-  const input = document.getElementById('url-input');
+const renderFeedback = (state, i18, elements) => {
+  if (state === 'sending') {
+    console.log(elements.submitBtn);
+    elements.submitBtn.disabled = true;
+    console.log(elements.submitBtn);
+    console.log(elements.submitBtn.attributes);
+  }
   if (state === 'invalid') {
-    elem.textContent = i18.t('texts.statusMessage.invalid');
-    elem.classList.remove('text-success');
-    elem.classList.add('text-danger');
-    input.classList.add('is-invalid');
+    elements.feedbackEl.textContent = i18.t('texts.statusMessage.invalid');
+    elements.feedbackEl.classList.remove('text-success');
+    elements.feedbackEl.classList.add('text-danger');
+    elements.inputEl.classList.add('is-invalid');
+    elements.submitBtn.disabled = false;
   } else if (state === 'existing') {
-    elem.textContent = i18.t('texts.statusMessage.existing');
-    elem.classList.remove('text-success');
-    elem.classList.add('text-danger');
-    input.classList.add('is-invalid');
+    elements.feedbackEl.textContent = i18.t('texts.statusMessage.existing');
+    elements.feedbackEl.classList.remove('text-success');
+    elements.feedbackEl.classList.add('text-danger');
+    elements.inputEl.classList.add('is-invalid');
+    elements.submitBtn.disabled = false;
   } else if (state === 'successful') {
-    elem.textContent = i18.t('texts.statusMessage.successful');
-    elem.classList.remove('text-danger');
-    elem.classList.add('text-success');
-    input.classList.remove('is-invalid');
+    elements.feedbackEl.textContent = i18.t('texts.statusMessage.successful');
+    elements.feedbackEl.classList.remove('text-danger');
+    elements.feedbackEl.classList.add('text-success');
+    elements.inputEl.classList.remove('is-invalid');
+    console.log(elements.buttonEl);
+    elements.submitBtn.disabled = false;
+    elements.inputEl.value = '';
+    elements.inputEl.focus();
   } else if (state === 'noValidRss') {
-    elem.textContent = i18.t('texts.statusMessage.noValidRss');
-    elem.classList.add('text-danger');
-    elem.classList.remove('text-success');
-    input.classList.add('is-invalid');
+    elements.feedbackEl.textContent = i18.t('texts.statusMessage.noValidRss');
+    elements.feedbackEl.classList.add('text-danger');
+    elements.feedbackEl.classList.remove('text-success');
+    elements.inputEl.classList.add('is-invalid');
+    elements.submitBtn.disabled = false;
   } else if (state === 'networkError') {
-    elem.textContent = i18.t('texts.statusMessage.networkError');
-    elem.classList.add('text-danger');
-    elem.classList.remove('text-success');
-    input.classList.add('is-invalid');
+    elements.feedbackEl.textContent = i18.t('texts.statusMessage.networkError');
+    elements.feedbackEl.classList.add('text-danger');
+    elements.feedbackEl.classList.remove('text-success');
+    elements.inputEl.classList.add('is-invalid');
+    elements.submitBtn.disabled = false;
   } else {
-    elem.textContent = '';
-    input.classList.remove('is-invalid');
+    elements.feedbackEl.textContent = '';
+    elements.inputEl.classList.remove('is-invalid');
+    elements.submitBtn.disabled = false;
   }
 };
 
-const renderFeeds = (state, i18) => {
-  const container = document.querySelector('.feeds');
+const renderFeeds = (state, i18, elements) => {
   const feedsInner = `
     <div class="card border-0">
         <div class="card-body">
@@ -51,11 +63,10 @@ const renderFeeds = (state, i18) => {
       </ul>
     </div>
   `;
-  container.innerHTML = feedsInner;
+  elements.feedsContainer.innerHTML = feedsInner;
 };
 
-const renderPosts = (posts, i18, handler, state) => {
-  const container = document.querySelector('.posts');
+const renderPosts = (posts, i18, handler, state, elements) => {
   const postsInner = `
   <div class="card border-0">
       <div class="card-body">
@@ -71,46 +82,39 @@ const renderPosts = (posts, i18, handler, state) => {
     <ul>
   </div>
   `;
-  container.innerHTML = postsInner;
-  container.querySelectorAll('button')
+  elements.postsContainer.innerHTML = postsInner;
+  elements.postsContainer.querySelectorAll('button')
     .forEach((btn) => {
       const id = btn.previousElementSibling.getAttribute('data-id');
       btn.addEventListener('click', handler(id));
     });
 };
 
-const renderModal = (state) => {
-  console.log('MODAL !!!!!!!!!!!!!!!!!!!!!');
-  console.log(state);
-  const container = document.querySelector('#modal');
+const renderModal = (state, elements) => {
   const { text, link, content } = state.posts.find((i) => i.id === state.activePostId);
-  const titleEl = container.querySelector('.modal-title');
-  titleEl.textContent = text;
-  const bodyEl = container.querySelector('.modal-body');
-  bodyEl.textContent = content;
-  const linkEl = document.querySelector('.btn-primary');
-  linkEl.setAttribute('href', link);
-  container.classList.add('show');
-  container.setAttribute('style', 'display:block');
+  elements.modalTitleEl.textContent = text;
+  elements.modalBodyEl.textContent = content;
+  elements.modalLinkEl.setAttribute('href', link);
+  elements.modalContainer.classList.add('show');
+  elements.modalContainer.setAttribute('style', 'display:block');
   const backDrop = document.createElement('div');
   backDrop.classList.add('modal-backdrop', 'fade', 'show');
-  container.after(backDrop);
-  container
+  elements.modalContainer.after(backDrop);
+  elements.modalContainer
     .querySelectorAll('[data-bs-dismiss="modal"]')
     .forEach((btn) => {
       btn.addEventListener('click', () => {
         state.activePostId = null;
-        container.classList.remove('show');
-        container.setAttribute('style', 'display:none');
+        elements.modalContainer.classList.remove('show');
+        elements.modalContainer.setAttribute('style', 'display:none');
         backDrop.remove();
       });
     });
 };
 
-const renderViewed = (state) => {
-  const postsEl = document.querySelector('.posts');
+const renderViewed = (state, elements) => {
   state.forEach((id) => {
-    const elem = postsEl.querySelector(`a[data-id="${id}"]`);
+    const elem = elements.postsContainer.querySelector(`a[data-id="${id}"]`);
     elem.classList.remove('fw-bold');
     elem.classList.add('fw-normal', 'link-secondary');
   });
@@ -120,27 +124,24 @@ const makeWatchedState = (
   state,
   i18Instance,
   openModalHandler,
+  elements,
 ) => onChange(state, (path, value) => {
   if (path.match(/^status/)) {
-    renderFeedback(value, i18Instance);
-    console.log(this);
+    renderFeedback(value, i18Instance, elements);
   }
   if (path.match(/^feeds/)) {
-    renderFeeds(value, i18Instance);
+    renderFeeds(value, i18Instance, elements);
   }
   if (path.match(/^posts/)) {
-    console.log(this);
-    renderPosts(value, i18Instance, openModalHandler, state);
+    renderPosts(value, i18Instance, openModalHandler, state, elements);
   }
   if (path.match(/^activePostId/)) {
-    console.log(path);
-    console.log(value);
     if (value) {
-      renderModal(state);
+      renderModal(state, elements);
     }
   }
   if (path.match(/^viewedIds/)) {
-    renderViewed(value);
+    renderViewed(value, elements);
   }
 });
 

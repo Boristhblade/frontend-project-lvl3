@@ -17,7 +17,9 @@ const updateFeed = (state) => {
           const { posts } = parse(item.data.contents);
           return [...acc, ...posts];
         }, []);
-        const newPosts = _.differenceBy(postsAll, Array.from(state.posts), 'text');
+        const newPosts = _
+          .differenceBy(postsAll, Array.from(state.posts), 'text')
+          .map((post) => ({ ...post, id: _.uniqueId() }));
         if (newPosts.length !== 0) { state.posts = [...newPosts, ...state.posts]; }
       })
       .catch((e) => console.log(e))
@@ -45,6 +47,18 @@ export default () => {
     posts: [],
     viewedIds: [],
   };
+  const elements = {
+    feedbackEl: document.querySelector('.feedback'),
+    inputEl: document.getElementById('url-input'),
+    submitBtn: document.querySelector('button[type="submit"]'),
+    feedsContainer: document.querySelector('.feeds'),
+    postsContainer: document.querySelector('.posts'),
+    modalContainer: document.getElementById('modal'),
+    modalTitleEl: document.querySelector('.modal-title'),
+    modalBodyEl: document.querySelector('.modal-body'),
+    modalLinkEl: document.querySelector('.full-article'),
+  };
+  console.log(elements);
   const i18Instance = i18next.createInstance();
   i18Instance.init({
     lng: state.lng,
@@ -53,7 +67,6 @@ export default () => {
   })
     .then(() => {
       const form = document.querySelector('form');
-      const inputEl = document.getElementById('url-input');
       const watchedState = makeWatchedState(
         state,
         i18Instance,
@@ -64,10 +77,12 @@ export default () => {
             watchedState.viewedIds = [...watchedState.viewedIds, id];
           }
         },
+        elements,
       );
       updateFeed(watchedState, watchedState.urls);
       form.addEventListener('submit', (e) => {
         e.preventDefault();
+        watchedState.status = 'sending';
         const formData = new FormData(e.target);
         makeYupSchema(watchedState.watchedUrls)
           .validate(formData.get('url'), { abortEarly: true })
@@ -83,8 +98,6 @@ export default () => {
             watchedState.posts = [...postsWithIds, ...watchedState.posts];
             watchedState.watchedUrls = [...watchedState.watchedUrls, formData.get('url')];
             watchedState.status = 'successful';
-            inputEl.value = '';
-            inputEl.focus();
           })
           .catch((err) => {
             if (err.name === 'AxiosError') {
