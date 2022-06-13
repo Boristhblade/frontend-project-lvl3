@@ -1,9 +1,7 @@
 import onChange from 'on-change';
 
 const renderFeedback = (state, i18, elements) => {
-  if (state === 'sending') {
-    elements.submitBtn.disabled = true;
-  }
+  elements.submitBtn.disabled = true;
   if (state === 'invalid') {
     elements.feedbackEl.textContent = i18.t('texts.statusMessage.invalid');
     elements.feedbackEl.classList.remove('text-success');

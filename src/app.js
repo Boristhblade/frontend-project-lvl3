@@ -28,14 +28,6 @@ const updateFeed = (state) => {
   setTimeout(cb, 5000);
 };
 
-// const openModalHandler = (state, id) => () => {
-//   state.activePostId = id;
-//   console.log(state);
-//   if (!state.viewedIds.includes(id)) {
-//     state.viewedIds = [...state.viewedIds, id];
-//   }
-// };
-
 export default () => {
   const defaultLanguage = 'ru';
   const state = {
@@ -60,7 +52,6 @@ export default () => {
     modalLinkEl: document.querySelector('.full-article'),
   };
 
-  console.log(elements);
   const i18Instance = i18next.createInstance();
   i18Instance.init({
     lng: state.lng,
