@@ -47,10 +47,11 @@ export default () => {
     posts: [],
     viewedIds: [],
   };
+
   const elements = {
     feedbackEl: document.querySelector('.feedback'),
     inputEl: document.getElementById('url-input'),
-    submitBtn: document.querySelector('button[type="submit"]'),
+    submitBtn: document.getElementById('submit'),
     feedsContainer: document.querySelector('.feeds'),
     postsContainer: document.querySelector('.posts'),
     modalContainer: document.getElementById('modal'),
@@ -58,6 +59,7 @@ export default () => {
     modalBodyEl: document.querySelector('.modal-body'),
     modalLinkEl: document.querySelector('.full-article'),
   };
+
   console.log(elements);
   const i18Instance = i18next.createInstance();
   i18Instance.init({

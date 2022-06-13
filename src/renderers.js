@@ -2,10 +2,7 @@ import onChange from 'on-change';
 
 const renderFeedback = (state, i18, elements) => {
   if (state === 'sending') {
-    console.log(elements.submitBtn);
     elements.submitBtn.disabled = true;
-    console.log(elements.submitBtn);
-    console.log(elements.submitBtn.attributes);
   }
   if (state === 'invalid') {
     elements.feedbackEl.textContent = i18.t('texts.statusMessage.invalid');
@@ -24,7 +21,6 @@ const renderFeedback = (state, i18, elements) => {
     elements.feedbackEl.classList.remove('text-danger');
     elements.feedbackEl.classList.add('text-success');
     elements.inputEl.classList.remove('is-invalid');
-    console.log(elements.buttonEl);
     elements.submitBtn.disabled = false;
     elements.inputEl.value = '';
     elements.inputEl.focus();
