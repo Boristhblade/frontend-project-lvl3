@@ -1,8 +1,9 @@
 import onChange from 'on-change';
 
 const renderFeedback = (state, i18, elements) => {
-  elements.submitBtn.disabled = true;
-  if (state === 'invalid') {
+  if (state === 'sending') {
+    elements.submitBtn.disabled = true;
+  } else if (state === 'invalid') {
     elements.feedbackEl.textContent = i18.t('texts.statusMessage.invalid');
     elements.feedbackEl.classList.remove('text-success');
     elements.feedbackEl.classList.add('text-danger');
@@ -33,10 +34,6 @@ const renderFeedback = (state, i18, elements) => {
     elements.feedbackEl.classList.add('text-danger');
     elements.feedbackEl.classList.remove('text-success');
     elements.inputEl.classList.add('is-invalid');
-    elements.submitBtn.disabled = false;
-  } else {
-    elements.feedbackEl.textContent = '';
-    elements.inputEl.classList.remove('is-invalid');
     elements.submitBtn.disabled = false;
   }
 };
