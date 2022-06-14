@@ -35,6 +35,10 @@ const renderFeedback = (state, i18, elements) => {
     elements.feedbackEl.classList.remove('text-success');
     elements.inputEl.classList.add('is-invalid');
     elements.submitBtn.disabled = false;
+  } else {
+    elements.feedbackEl.textContent = '';
+    elements.inputEl.classList.remove('is-invalid');
+    elements.submitBtn.disabled = false;
   }
 };
 
