@@ -6,6 +6,10 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const isProduction = process.env.NODE_ENV == "production";
 
 const config = {
+  performance: {
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000
+},
   entry: "./src/index.js",
   output: {
     path: path.resolve(__dirname, "dist"),
