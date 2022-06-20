@@ -1,7 +1,6 @@
 export default (url) => {
-  const builtUrl = new URL('/get', 'https://allorigins.hexlet.app');
-  const searchParams = new URLSearchParams(builtUrl.search);
-  searchParams.append('disabledCache', 'true');
-  searchParams.append('url', url);
-  return `${builtUrl.toString()}?${decodeURIComponent(searchParams.toString())}`;
+  const urlWithProxy = new URL('/get', 'https://allorigins.hexlet.app');
+  urlWithProxy.searchParams.set('url', url);
+  urlWithProxy.searchParams.set('disableCache', 'true');
+  return urlWithProxy.toString();
 };
