@@ -28,6 +28,17 @@ const updateFeed = (state) => {
   setTimeout(cb, 5000);
 };
 
+const openModalHandler = (id, state) => () => {
+  state.activePostId = id;
+  if (!state.viewedIds.includes(id)) {
+    state.viewedIds = [...state.viewedIds, id];
+  }
+};
+
+const closeModalHandler = (state) => () => {
+  state.activePostId = null;
+};
+
 export default () => {
   const defaultLanguage = 'ru';
   const state = {
@@ -63,13 +74,8 @@ export default () => {
       const watchedState = makeWatchedState(
         state,
         i18Instance,
-        (id) => () => {
-          watchedState.activePostId = id;
-          console.log(state);
-          if (!state.viewedIds.includes(id)) {
-            watchedState.viewedIds = [...watchedState.viewedIds, id];
-          }
-        },
+        openModalHandler,
+        closeModalHandler,
         elements,
       );
       updateFeed(watchedState, watchedState.urls);
@@ -77,8 +83,9 @@ export default () => {
         e.preventDefault();
         watchedState.status = 'sending';
         const formData = new FormData(e.target);
+        const trimmedUrl = formData.get('url').trim();
         makeYupSchema(watchedState.watchedUrls)
-          .validate(formData.get('url'), { abortEarly: true })
+          .validate(trimmedUrl, { abortEarly: true })
           .then((url) => axios.get(buildPath(url)))
           .then((response) => {
             const parsedData = parse(response.data.contents);
@@ -89,7 +96,7 @@ export default () => {
             }));
             watchedState.feeds = [...watchedState.feeds, { title, description }];
             watchedState.posts = [...postsWithIds, ...watchedState.posts];
-            watchedState.watchedUrls = [...watchedState.watchedUrls, formData.get('url')];
+            watchedState.watchedUrls = [...watchedState.watchedUrls, trimmedUrl];
             watchedState.status = 'successful';
           })
           .catch((err) => {
